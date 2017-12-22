@@ -6,7 +6,7 @@
 
 
 sessionShow={}
-if(window.location.href.indexOf("localhost") > -1){
+if(window.location.href.indexOf("localhost") >-1 && window.location.href.indexOf("sbilm-fx-web")  > -1 ){
 
 	setInterval(function(){
 

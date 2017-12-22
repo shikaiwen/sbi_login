@@ -5,32 +5,37 @@ var SESN = null;
 var onBeforeSendHeaders_callback = function(details) {
 
 
-   if(details.url.indexOf("Rate.aspx")!= -1) return;
-   console.log(details.url)
+   // if(details.url.indexOf("Rate.aspx")!= -1) return;
+   // console.log(details.url)
 
-  if(details.url == "https://dev-trade.sbifxt.co.jp/web/pc/Home/ImportantInfo"){
 
   if(details.url == "https://dev-trade.sbifxt.co.jp/web/pc/Home/Login"){
     
   }
 
-    var cookieStr = ""
-    for(var v in details.requestHeaders){
-      if(details.requestHeaders[v]["name"] == "Cookie"){
+
+  var pmap = {}
+
+  if (details.url == "https://dev-trade.sbifxt.co.jp/web/pc/Home/ImportantInfo") {
+
+    var cookieStr = "";
+
+    for (var v in details.requestHeaders) {
+      if (details.requestHeaders[v]["name"] == "Cookie") {
         cookieStr = details.requestHeaders[v]["value"]
       }
     }
+
     var pArr = cookieStr.split(";")
-    var pmap = {}
+    
     for (var v = 0; v < pArr.length; v++) {
       var pair = pArr[v]
       pmap[pair.split("=")[0].replace(" ", "")] = pair.split("=")[1].replace(" ", "");
     }
-    SESN = pmap.SESN
 
+    SESN = pmap.SESN
   }
 
-  if(pmap.SESN) return;
 
   if (details.url.indexOf("RefPositionSummaryList") > -1 ) {
 
@@ -38,7 +43,6 @@ var onBeforeSendHeaders_callback = function(details) {
     var paramStr = url.substr(url.indexOf("?"))
     var pArr= paramStr.split("&")
 
-    var pmap = {}
     for (var v =0 ;v <  pArr.length; v++){
         var pair = pArr[v]
         pmap[pair.split("=")[0]] = pair.split("=")[1];
@@ -76,7 +80,6 @@ var onBeforeSendHeaders_filters = {
 
 chrome.webRequest.onBeforeSendHeaders.addListener(onBeforeSendHeaders_callback, onBeforeSendHeaders_filters,['requestHeaders']);
 
-
  
 
 
@@ -84,7 +87,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(onBeforeSendHeaders_callback, 
 function isSessionValid(s){
 
   var valid = false;
-  if(!s) return timeout;
+  if(!s) return valid;
 
   var cheader = {
     "Accept": "text/plain, */*; q=0.01",

@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "sbi_login",
-  "description": "words remembering tool",
+  "description": "sbi login tool",
   "version": "1.0",
   "background":{
       "scripts":[
@@ -23,8 +23,6 @@
   ],
   "browser_action": {
   },
-  // "web_accessible_resources": ["template.html","btn_myword_add.gif","btn_myword_del.gif","wordlib.html"],
-
   "permissions": [
     "contextMenus",
     "activeTab",
