@@ -23,6 +23,7 @@
   ],
   "browser_action": {
   },
+  "devtools_page": "devtools.html",
   "permissions": [
     "contextMenus",
     "activeTab",

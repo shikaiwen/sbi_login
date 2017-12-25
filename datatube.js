@@ -23,21 +23,45 @@ if (!isBackground) {
 
 	}
 
-	datatube.front.request_getValidSession = function(callback) {
+	datatube.front.request_getValidSession = function(callback,data) {
 
 		datatube.front.callback_getValidSession = callback;
 		chrome.runtime.sendMessage({
-			"key": "getValidSession"
+			"key": "getValidSession",
+			"val":data
+		});
+
+	}
+
+
+	// invoke background method 
+	datatube.front.request_invokeBackgroundFun = function(arguments,callback) {
+
+		datatube.front.request_invokeBackgroundFun = callback;
+		chrome.runtime.sendMessage({
+			"key": "invokeBackgroundFun",
+			"val": arguments
 		});
 
 
 	}
 
 
+	datatube.front.request_callInitInPage = function() {
+
+		chrome.runtime.sendMessage({
+			"key": "callInitInPage"
+		});
+
+
+	}
+	
+
+
+
 	//font end
 	chrome.runtime.onMessage.addListener(
 		function(request, sender, sendResponse) {
-
 
 			if( request.key == "getSessionStatus" ) {
 		    	
@@ -48,14 +72,22 @@ if (!isBackground) {
 		 		
 		    }
 
-		    if( request.key == "getValidSession" ) {
+
+		    if( request.key == "returnValidSession" ) {
 		    	
 		 		var data = request.val;
 		 		if(datatube.front.callback_getValidSession){
-		 			datatube.front.callback_getValidSession(data);	
+		 			//callback only if get valid session
+		 			if(data){
+		 				datatube.front.callback_getValidSession(data);		
+		 			}
+		 			
 		 		}
 		 		
 		    }
+
+
+
 
 
 
@@ -75,8 +107,24 @@ if (!isBackground) {
 	}
 
 	datatube.backend.handle_getValidSession = function(url){
-		var result = getValidSession();
-		return result;
+
+		var result = getValidSession(function(validSession){
+
+			// call the contentScript
+			var resultData = {}
+		  	resultData["key"] = "returnValidSession";
+		  	resultData["val"] = validSession;
+			sendToActiveTab(resultData);
+
+		});
+		return result ?  result : "";
+	}
+
+	datatube.backend.handle_invokeBackgroundFun = function(arguments){
+
+		window[arguments[0]](Array.prototype.slice.call(arguments,1))
+
+		return data;
 	}
 
 	// backend
@@ -85,7 +133,6 @@ if (!isBackground) {
 
 	  	var resultData = {}
 	  	resultData["key"] = request.key;
-	  	resultData["val"] = {}
 
 	    if( request.key == "getSessionStatus" ) {
 
@@ -97,10 +144,33 @@ if (!isBackground) {
 
 	    if( request.key == "getValidSession" ) {
 
-	 		var data = datatube.backend.handle_getValidSession();
-	 		resultData.val = data;
-			sendToActiveTab(resultData);
+	 		var data = datatube.backend.handle_getValidSession(request.val);
 	    }
+
+
+	    if( request.key == "invokeBackgroundFun" ) {
+
+	 		var data = datatube.backend.handle_invokeBackgroundFun(request.val);
+	 		// resultData.val = data;
+			// sendToActiveTab(resultData);
+	    }
+
+	    if(request.key == "callInitInPage")
+
+			chrome.tabs.query({
+				active: true,
+				currentWindow: true
+			}, function(tabs) {
+				// var activeTab = tabs[0];
+				// chrome.tabs.sendMessage(activeTab.id, data);
+				
+				chrome.tabs.executeScript(tabs[0], {
+				code: "alert('aaa'); init();"
+			});
+			});
+
+
+
 
 
 	  }

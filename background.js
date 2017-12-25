@@ -34,42 +34,48 @@ var onBeforeSendHeaders_callback = function(details) {
     }
 
     SESN = pmap.SESN
+
+    if(validSessionWaiter){
+      validSessionWaiter(SESN)
+    }
+
   }
 
 
   if (details.url.indexOf("RefPositionSummaryList") > -1 ) {
-
     var url = details.url;
     var paramStr = url.substr(url.indexOf("?"))
     var pArr= paramStr.split("&")
-
     for (var v =0 ;v <  pArr.length; v++){
         var pair = pArr[v]
         pmap[pair.split("=")[0]] = pair.split("=")[1];
     }
-
     SESN = pmap.SESN
-    
   }
-
-
 
 
 
 }
 
-// var valid = false;
-// setInterval(function(){
-//   valid = isSessionValid();
-// }, 5000);
 
 
-function getValidSession(){
+var validSessionWaiter = null;
 
-  if(!SESN) return "";
+function getValidSession(callback){
+
+  
   var valid = isSessionValid(SESN);
+  if(valid){
+    callback(SESN)
+    return;
+  }
 
-  return valid ? SESN : "";
+
+  if(callback){
+    validSessionWaiter = callback  
+  }
+  
+  login();
 
 }
 
@@ -81,7 +87,6 @@ var onBeforeSendHeaders_filters = {
 chrome.webRequest.onBeforeSendHeaders.addListener(onBeforeSendHeaders_callback, onBeforeSendHeaders_filters,['requestHeaders']);
 
  
-
 
 
 function isSessionValid(s){
@@ -138,3 +143,50 @@ function isSessionValid(s){
 //         escape(request.request.url) + '"))');
 //     }
 //   });
+
+
+function login(){
+
+//   var headers = {
+// "Pragma":"no-cache",
+// "Origin": "http://localhost:8080",
+// "Accept-Encoding":"gzip, deflate, br",
+// "Host":"dev-trade.sbifxt.co.jp",
+// "Accept-Language":"en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7,ja;q=0.6",
+// "Upgrade-Insecure-Requests":"1",
+// "User-Agent":"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.108 Safari/537.36",
+// "Content-Type":"application/x-www-form-urlencoded",
+// "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+// "Cache-Control":"no-cache",
+// // "Access-Control-Allow-Origin":"*",
+// "Referer":"https://dev-www.sbifxt.co.jp/login.html",
+// "Connection":"keep-alive"
+//   }
+
+var headers = {
+  "Content-Type": "application/x-www-form-urlencoded",
+}
+
+
+  $.ajax({
+    headers: headers,
+    async: false,
+    method: "POST",
+    url: "https://dev-trade.sbifxt.co.jp/web/pc/Home/Login",
+    data: "ID=9972687425&PASS=000000&GUID=12345",
+    complete: function(xhr, textStatus) {
+
+      if(xhr.status != 200){
+          console.log(xhr.getAllResponseHeaders())
+      }
+
+      // if (xhr.responseText.indexOf("セッション") == -1) {
+      //   valid = true;
+      // }
+
+
+    }
+
+  })
+
+}

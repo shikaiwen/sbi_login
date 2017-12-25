@@ -8,50 +8,71 @@
 sessionShow={}
 if(window.location.href.indexOf("localhost") >-1 && window.location.href.indexOf("sbilm-fx-web")  > -1 ){
 
+
+
 	setInterval(function(){
 
-	datatube.front.request_getSessionStatus($.cookie("SESN"),function(res){
+
+
+},100000000)
+
+
+
+$(function(){
+		$("#autoLogin").on("click",function(){
+			autoLogin();
+		})
+})
+
+
+
+
+
+function autoLogin(){
+
+	datatube.front.request_getValidSession(function(ses){
+			$.cookie("SESN",ses);
+			// init();
+
+			datatube.front.request_callInitInPage()
+			
+			// code injection
+			// var yourCustomJavaScriptCode = 'init()';
+			// var script = $("<script>");
+			// $(script).attr("id", "sbilogin_inject");
+			// var code = document.createTextNode('(function() {' + yourCustomJavaScriptCode + '})();');
+			// $(script).append(code)
+			// $("body").append(script)
+	});
+}
+
+
+
+function doLoginLogic(){
+
+
+return ;
+
+		datatube.front.request_getSessionStatus($.cookie("SESN"),function(res){
 		console.log(res)
 
-
 		if(!res){
-
 			var msg = "<font size='4'>セッションタイムアウト、もう一度ログインしてください...</font>"
-
 			if($("#kdg000dialog").length == 0){
 				showMsg(msg)
 			}
-			
-
-
-			datatube.front.request_getValidSession(function(ses){
-				
-				if(ses){
-					$.cookie("SESN",ses);
-					showMsg("<font size='4'>セッション再設置完了、画面の更新必要がない</font>")
-					// sessionShow[ses] = 0;
-					// if(!sessionShow[$.cookie("SESN")]){
-					// }
-				}
-
-			});
-
 		}
-
-
-
-
-
 
 	});
 
-},1000)
+}
+
 
 }
 
 
 function showMsg(msg){
-
+	return;
 	if($("#kdg000dialog").length == 0){
 
 		dg = $("<div id='kdg000dialog'>").dialog({
@@ -69,6 +90,5 @@ function showMsg(msg){
 	}
 
 }
-
 
 
