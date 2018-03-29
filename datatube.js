@@ -106,7 +106,7 @@ if (!isBackground) {
 		return result;
 	}
 
-	datatube.backend.handle_getValidSession = function(url){
+	datatube.backend.handle_getValidSession = function(reqData){
 
 		var result = getValidSession(function(validSession){
 
@@ -116,8 +116,9 @@ if (!isBackground) {
 		  	resultData["val"] = validSession;
 			sendToActiveTab(resultData);
 
-		});
-		return result ?  result : "";
+		},reqData["username"], reqData["password"]);
+		
+		// return result ?  result : "";
 	}
 
 	datatube.backend.handle_invokeBackgroundFun = function(arguments){

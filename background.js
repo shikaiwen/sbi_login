@@ -61,21 +61,21 @@ var onBeforeSendHeaders_callback = function(details) {
 
 var validSessionWaiter = null;
 
-function getValidSession(callback){
+function getValidSession(callback, username,password){
 
   
-  var valid = isSessionValid(SESN);
-  if(valid){
-    callback(SESN)
-    return;
-  }
+  // var valid = isSessionValid(SESN);
+  // if(valid){
+  //   callback(SESN)
+  //   return;
+  // }
 
 
   if(callback){
     validSessionWaiter = callback  
   }
   
-  login();
+  login(username,password);
 
 }
 
@@ -145,7 +145,7 @@ function isSessionValid(s){
 //   });
 
 
-function login(){
+function login(username,password){
 
 //   var headers = {
 // "Pragma":"no-cache",
@@ -167,17 +167,18 @@ var headers = {
   "Content-Type": "application/x-www-form-urlencoded",
 }
 
+  var mydata = {"ID": username, "PASS": password, "GUID": "12345"}
 
   $.ajax({
     headers: headers,
-    async: false,
+    async: true,
     method: "POST",
     url: "https://dev-trade.sbifxt.co.jp/web/pc/Home/Login",
-    data: "ID=9972687425&PASS=000000&GUID=12345",
+    data: mydata,//"ID=9972687425&PASS=000000&GUID=12345",
     complete: function(xhr, textStatus) {
 
       if(xhr.status != 200){
-          console.log(xhr.getAllResponseHeaders())
+          // console.log(xhr.getAllResponseHeaders())
       }
 
       // if (xhr.responseText.indexOf("セッション") == -1) {
